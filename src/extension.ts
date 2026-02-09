@@ -2,6 +2,11 @@ import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';
 
+enum ProjectStructure {
+	MVC = 'MVC (controllers / routes / models)',
+	FEATURE = 'Feature-based (module folder)'
+}
+
 export function activate(context: vscode.ExtensionContext) {
 	console.log('Project File Generator activated');
 
@@ -16,6 +21,15 @@ export function activate(context: vscode.ExtensionContext) {
 }
 
 async function createBackendModule() {
+	const structure = await vscode.window.showQuickPick(
+		[ProjectStructure.MVC, ProjectStructure.FEATURE],
+		{
+			placeHolder: 'Select backend project structure'
+		}
+	);
+
+	if (!structure) return;
+
 	const moduleName = await vscode.window.showInputBox({
 		prompt: 'Enter module name (e.g., host)',
 		placeHolder: 'host'
@@ -26,7 +40,11 @@ async function createBackendModule() {
 		return;
 	}
 
-	createFiles(moduleName.toLowerCase());
+	if (structure === ProjectStructure.MVC) {
+		createMVCFiles(moduleName.toLowerCase());
+	} else {
+		createFeatureFiles(moduleName.toLowerCase());
+	}
 }
 
 function getWorkspaceRoot(): string | null {
@@ -74,13 +92,27 @@ export default mongoose.model('${name}', ${name}Schema);
 `;
 }
 
-function createFiles(moduleName: string) {
+function routeTemplateFeature(name: string) {
+	return `import express from 'express';
+import { ${name}Controller } from './${name}.controller.js';
+
+const router = express.Router();
+
+router.get('/', ${name}Controller);
+
+export default router;
+`;
+}
+
+function createMVCFiles(moduleName: string) {
 	const root = getWorkspaceRoot();
 	if (!root) return;
 
-	const controllersDir = path.join(root, 'controllers');
-	const routesDir = path.join(root, 'routes');
-	const modelsDir = path.join(root, 'models');
+	const srcDir = path.join(root, 'src');
+
+	const controllersDir = path.join(srcDir, 'controllers');
+	const routesDir = path.join(srcDir, 'routes');
+	const modelsDir = path.join(srcDir, 'models');
 
 	ensureFolder(controllersDir);
 	ensureFolder(routesDir);
@@ -114,6 +146,47 @@ function createFiles(moduleName: string) {
 
 	vscode.window.showInformationMessage(
 		`Backend module "${moduleName}" created successfully`
+	);
+}
+
+function createFeatureFiles(moduleName: string) {
+	const root = getWorkspaceRoot();
+	if (!root) return;
+
+	// You can change 'src' later via config
+	const srcDir = path.join(root, 'src');
+	const moduleDir = path.join(srcDir, moduleName);
+
+	ensureFolder(moduleDir);
+
+	const files = [
+		{
+			path: path.join(moduleDir, `${moduleName}.controller.js`),
+			content: controllerTemplate(moduleName)
+		},
+		{
+			path: path.join(moduleDir, `${moduleName}.routes.js`),
+			content: routeTemplateFeature(moduleName)
+		},
+		{
+			path: path.join(moduleDir, `${moduleName}.model.js`),
+			content: modelTemplate(moduleName)
+		}
+	];
+
+	for (const file of files) {
+		if (fs.existsSync(file.path)) {
+			vscode.window.showWarningMessage(
+				`File already exists: ${path.basename(file.path)}`
+			);
+			continue;
+		}
+
+		fs.writeFileSync(file.path, file.content);
+	}
+
+	vscode.window.showInformationMessage(
+		`Feature-based module "${moduleName}" created successfully`
 	);
 }
 
