@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';
+import { toPascalCase, toCamelCase, toKebabCase } from './utils/case.util';
 
 enum ProjectStructure {
 	MVC = 'MVC (controllers / routes / models)',
@@ -68,8 +69,9 @@ function capitalize(word: string) {
 	return word.charAt(0).toUpperCase() + word.slice(1);
 }
 
-function controllerTemplate(name: string) {
-	const Name = capitalize(name);
+function controllerTemplate(rawName: string) {
+	const Name = toPascalCase(rawName);
+	const name = toCamelCase(rawName);
 
 	return `export const create${Name} = async (req, res) => {
 	try {
@@ -113,8 +115,9 @@ export const delete${Name} = async (req, res) => {
 `;
 }
 
-function routeTemplate(name: string) {
-	const Name = capitalize(name);
+function routeTemplate(rawName: string) {
+	const Name = toPascalCase(rawName);   // PascalCase for functions/classes
+	const routeName = toKebabCase(rawName); // kebab-case for URLs & filenames
 
 	return `import express from 'express';
 import {
@@ -123,7 +126,7 @@ import {
 	get${Name}ById,
 	update${Name},
 	delete${Name}
-} from '../controllers/${name}.controller.js';
+} from '../controllers/${routeName}.controller.js';
 
 const router = express.Router();
 
@@ -137,8 +140,8 @@ export default router;
 `;
 }
 
-function modelTemplate(name: string) {
-	const Name = capitalize(name);
+function modelTemplate(rawName: string) {
+	const Name = toPascalCase(rawName);
 
 	return `import mongoose from 'mongoose';
 
@@ -153,8 +156,9 @@ export default mongoose.model('${Name}', ${Name}Schema);
 `;
 }
 
-function routeTemplateFeature(name: string) {
-	const Name = capitalize(name);
+function routeTemplateFeature(rawName: string) {
+	const Name = toPascalCase(rawName);
+	const routeName = toKebabCase(rawName);
 
 	return `import express from 'express';
 import {
@@ -163,7 +167,7 @@ import {
 	get${Name}ById,
 	update${Name},
 	delete${Name}
-} from './${name}.controller.js';
+} from './${routeName}.controller.js';
 
 const router = express.Router();
 
@@ -177,15 +181,15 @@ export default router;
 `;
 }
 
-function createMVCFiles(moduleName: string) {
+function createMVCFiles(rawName: string) {
 	const root = getWorkspaceRoot();
 	if (!root) return;
 
-	const srcDir = path.join(root, 'src');
+	const name = toKebabCase(rawName);
 
-	const controllersDir = path.join(srcDir, 'controllers');
-	const routesDir = path.join(srcDir, 'routes');
-	const modelsDir = path.join(srcDir, 'models');
+	const controllersDir = path.join(root, 'src/controllers');
+	const routesDir = path.join(root, 'src/routes');
+	const modelsDir = path.join(root, 'src/models');
 
 	ensureFolder(controllersDir);
 	ensureFolder(routesDir);
@@ -193,48 +197,50 @@ function createMVCFiles(moduleName: string) {
 
 	const files = [
 		{
-			path: path.join(controllersDir, `${moduleName}.controller.js`),
-			content: controllerTemplate(moduleName)
+			path: path.join(controllersDir, `${name}.controller.js`),
+			content: controllerTemplate(rawName)
 		},
 		{
-			path: path.join(routesDir, `${moduleName}.routes.js`),
-			content: routeTemplate(moduleName)
+			path: path.join(routesDir, `${name}.routes.js`),
+			content: routeTemplate(rawName)
 		},
 		{
-			path: path.join(modelsDir, `${moduleName}.model.js`),
-			content: modelTemplate(moduleName)
+			path: path.join(modelsDir, `${name}.model.js`),
+			content: modelTemplate(rawName)
 		}
 	];
 
-	writeFiles(files, moduleName);
+	writeFiles(files, rawName);
 }
 
-function createFeatureFiles(moduleName: string) {
+function createFeatureFiles(rawName: string) {
 	const root = getWorkspaceRoot();
 	if (!root) return;
 
-	// You can change 'src' later via config
-	const srcDir = path.join(root, 'src');
-	const moduleDir = path.join(srcDir, moduleName);
+	const kebab = toKebabCase(rawName);   // folder & file names
+	const pascal = toPascalCase(rawName); // template names
 
+	// Feature folder inside 'src'
+	const srcDir = path.join(root, 'src');
+	const moduleDir = path.join(srcDir, kebab); // feature-based folder
 	ensureFolder(moduleDir);
 
 	const files = [
 		{
-			path: path.join(moduleDir, `${moduleName}.controller.js`),
-			content: controllerTemplate(moduleName)
+			path: path.join(moduleDir, `${kebab}.controller.js`),
+			content: controllerTemplate(pascal)
 		},
 		{
-			path: path.join(moduleDir, `${moduleName}.routes.js`),
-			content: routeTemplateFeature(moduleName)
+			path: path.join(moduleDir, `${kebab}.routes.js`),
+			content: routeTemplateFeature(rawName)
 		},
 		{
-			path: path.join(moduleDir, `${moduleName}.model.js`),
-			content: modelTemplate(moduleName)
+			path: path.join(moduleDir, `${kebab}.model.js`),
+			content: modelTemplate(pascal)
 		}
 	];
 
-	writeFiles(files, moduleName);
+	writeFiles(files, rawName);
 }
 
 function writeFiles(files: { path: string; content: string }[], moduleName: string) {
