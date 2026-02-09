@@ -7,19 +7,6 @@ enum ProjectStructure {
 	FEATURE = 'Feature-based (module folder)'
 }
 
-export function activate(context: vscode.ExtensionContext) {
-	console.log('Project File Generator activated');
-
-	const command = vscode.commands.registerCommand(
-		'projectFileGenerator.createBackendModule',
-		async () => {
-			await createBackendModule();
-		}
-	);
-
-	context.subscriptions.push(command);
-}
-
 async function createBackendModule() {
 	const structure = await vscode.window.showQuickPick(
 		[ProjectStructure.MVC, ProjectStructure.FEATURE],
@@ -47,6 +34,21 @@ async function createBackendModule() {
 	}
 }
 
+export function activate(context: vscode.ExtensionContext) {
+	console.log('Project File Generator activated');
+
+	const command = vscode.commands.registerCommand(
+		'projectFileGenerator.createBackendModule',
+		async () => {
+			await createBackendModule();
+		}
+	);
+
+	context.subscriptions.push(command);
+}
+
+
+
 function getWorkspaceRoot(): string | null {
 	const workspaceFolders = vscode.workspace.workspaceFolders;
 	if (!workspaceFolders) {
@@ -62,43 +64,114 @@ function ensureFolder(folderPath: string) {
 	}
 }
 
+function capitalize(word: string) {
+	return word.charAt(0).toUpperCase() + word.slice(1);
+}
+
 function controllerTemplate(name: string) {
-	return `export const ${name}Controller = (req, res) => {
-	res.send('${name} controller works');
+	const Name = capitalize(name);
+
+	return `export const create${Name} = async (req, res) => {
+	try {
+		res.status(201).json({ message: '${Name} created successfully' });
+	} catch (error) {
+		res.status(500).json({ error: error.message });
+	}
+};
+
+export const get${Name}s = async (req, res) => {
+	try {
+		res.status(200).json([]);
+	} catch (error) {
+		res.status(500).json({ error: error.message });
+	}
+};
+
+export const get${Name}ById = async (req, res) => {
+	try {
+		res.status(200).json({});
+	} catch (error) {
+		res.status(500).json({ error: error.message });
+	}
+};
+
+export const update${Name} = async (req, res) => {
+	try {
+		res.status(200).json({ message: '${Name} updated successfully' });
+	} catch (error) {
+		res.status(500).json({ error: error.message });
+	}
+};
+
+export const delete${Name} = async (req, res) => {
+	try {
+		res.status(200).json({ message: '${Name} deleted successfully' });
+	} catch (error) {
+		res.status(500).json({ error: error.message });
+	}
 };
 `;
 }
 
 function routeTemplate(name: string) {
+	const Name = capitalize(name);
+
 	return `import express from 'express';
-import { ${name}Controller } from '../controllers/${name}.controller.js';
+import {
+	create${Name},
+	get${Name}s,
+	get${Name}ById,
+	update${Name},
+	delete${Name}
+} from '../controllers/${name}.controller.js';
 
 const router = express.Router();
 
-router.get('/', ${name}Controller);
+router.post('/', create${Name});
+router.get('/', get${Name}s);
+router.get('/:id', get${Name}ById);
+router.put('/:id', update${Name});
+router.delete('/:id', delete${Name});
 
 export default router;
 `;
 }
 
 function modelTemplate(name: string) {
+	const Name = capitalize(name);
+
 	return `import mongoose from 'mongoose';
 
-const ${name}Schema = new mongoose.Schema({
-	// fields here
-}, { timestamps: true });
+const ${Name}Schema = new mongoose.Schema(
+	{
+		// TODO: define fields
+	},
+	{ timestamps: true }
+);
 
-export default mongoose.model('${name}', ${name}Schema);
+export default mongoose.model('${Name}', ${Name}Schema);
 `;
 }
 
 function routeTemplateFeature(name: string) {
+	const Name = capitalize(name);
+
 	return `import express from 'express';
-import { ${name}Controller } from './${name}.controller.js';
+import {
+	create${Name},
+	get${Name}s,
+	get${Name}ById,
+	update${Name},
+	delete${Name}
+} from './${name}.controller.js';
 
 const router = express.Router();
 
-router.get('/', ${name}Controller);
+router.post('/', create${Name});
+router.get('/', get${Name}s);
+router.get('/:id', get${Name}ById);
+router.put('/:id', update${Name});
+router.delete('/:id', delete${Name});
 
 export default router;
 `;
@@ -133,20 +206,7 @@ function createMVCFiles(moduleName: string) {
 		}
 	];
 
-	for (const file of files) {
-		if (fs.existsSync(file.path)) {
-			vscode.window.showWarningMessage(
-				`File already exists: ${path.basename(file.path)}`
-			);
-			continue;
-		}
-
-		fs.writeFileSync(file.path, file.content);
-	}
-
-	vscode.window.showInformationMessage(
-		`Backend module "${moduleName}" created successfully`
-	);
+	writeFiles(files, moduleName);
 }
 
 function createFeatureFiles(moduleName: string) {
@@ -174,6 +234,10 @@ function createFeatureFiles(moduleName: string) {
 		}
 	];
 
+	writeFiles(files, moduleName);
+}
+
+function writeFiles(files: { path: string; content: string }[], moduleName: string) {
 	for (const file of files) {
 		if (fs.existsSync(file.path)) {
 			vscode.window.showWarningMessage(
@@ -181,12 +245,11 @@ function createFeatureFiles(moduleName: string) {
 			);
 			continue;
 		}
-
 		fs.writeFileSync(file.path, file.content);
 	}
 
 	vscode.window.showInformationMessage(
-		`Feature-based module "${moduleName}" created successfully`
+		`REST backend module "${moduleName}" created successfully`
 	);
 }
 
