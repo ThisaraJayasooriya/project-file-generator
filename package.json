@@ -12,13 +12,13 @@
   "activationEvents": [],
   "main": "./out/extension.js",
   "contributes": {
-    "commands": [
-      {
-        "command": "project-file-generator.helloWorld",
-        "title": "Hello World"
-      }
-    ]
-  },
+  "commands": [
+    {
+      "command": "projectFileGenerator.createBackendModule",
+      "title": "Create Backend Module"
+    }
+  ]
+},
   "scripts": {
     "vscode:prepublish": "npm run compile",
     "compile": "tsc -p ./",
