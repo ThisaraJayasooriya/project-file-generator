@@ -1,71 +1,150 @@
-# project-file-generator README
+# Project File Generator
 
-This is the README for your extension "project-file-generator". After writing up a brief description, we recommend including the following sections.
+A VS Code extension that accelerates MERN stack development by automatically generating complete project modules with proper file structure, naming conventions, and boilerplate code for both frontend and backend components.
 
-## Features
+## ✨ Features
 
-Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
+### 🚀 Quick Module Generation
+Generate complete MERN stack modules with a single command, including:
 
-For example if there is an image subfolder under your extension project workspace:
+**Backend:**
+- **Controllers**: CRUD operation handlers with error handling
+- **Routes**: Express router setup with RESTful endpoints
+- **Models**: Mongoose schema templates with timestamps
 
-\!\[feature X\]\(images/feature-x.png\)
+**Frontend:** (Coming Soon)
+- **Components**: React components with TypeScript support
+- **Pages**: Next.js page templates
+- **Services**: API integration utilities
 
-> Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
+### 🏗️ Multiple Project Structures
+Choose between popular MERN stack architectures:
 
-## Requirements
+**Backend Structures:**
 
-If you have any requirements or dependencies, add a section describing those and how to install and configure them.
+1. **MVC Structure** (Separation of Concerns)
+   ```
+   src/
+   ├── controllers/
+   │   └── module-name.controller.js
+   ├── routes/
+   │   └── module-name.routes.js
+   └── models/
+       └── module-name.model.js
+   ```
 
-## Extension Settings
+2. **Feature-Based Structure** (Domain-Driven)
+   ```
+   src/
+   └── module-name/
+       ├── module-name.controller.js
+       ├── module-name.routes.js
+       └── module-name.model.js
+   ```
 
-Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
+### 🎯 Smart Naming Conventions
+Automatically applies proper case conventions:
+- **kebab-case** for file names and URLs
+- **PascalCase** for model/class names
+- **camelCase** for variables and functions
 
-For example:
+### 📝 Pre-configured Templates
+Generated files include:
+- ✅ Standard CRUD operations (Create, Read, Update, Delete, List)
+- ✅ Error handling and status codes
+- ✅ Mongoose schema boilerplate
+- ✅ Express router configuration
+- ✅ ES6 module syntax
 
-This extension contributes the following settings:
+## 📦 Installation
 
-* `myExtension.enable`: Enable/disable this extension.
-* `myExtension.thing`: Set to `blah` to do something.
+1. Open VS Code
+2. Press `Ctrl+P` / `Cmd+P`
+3. Type `ext install project-file-generator`
+4. Press Enter
 
-## Known Issues
+## 🛠️ Usage
 
-Calling out known issues can help limit users opening duplicate issues against your extension.
+1. Open your MERN project workspace in VS Code
+2. Open the Command Palette (`Ctrl+Shift+P` / `Cmd+Shift+P`)
+3. Type and select **"Create Backend Module"**
+4. Choose your project structure (MVC or Feature-based)
+5. Enter the module name (e.g., "user", "product", "host")
+6. Files are generated automatically in the appropriate directories
 
-## Release Notes
+## 📋 Requirements
 
-Users appreciate release notes as you update your extension.
+- Visual Studio Code v1.109.0 or higher
+- Node.js project with `src/` directory structure
+- MERN stack project (MongoDB, Express, React, Node.js)
 
-### 1.0.0
+## 🎨 Example Output
 
-Initial release of ...
+When you create a module named "host", the extension generates:
 
-### 1.0.1
+**Controller** (`host.controller.js`):
+```javascript
+export const createHost = async (req, res) => { /* ... */ };
+export const getHosts = async (req, res) => { /* ... */ };
+export const getHostById = async (req, res) => { /* ... */ };
+export const updateHost = async (req, res) => { /* ... */ };
+export const deleteHost = async (req, res) => { /* ... */ };
+```
 
-Fixed issue #.
+**Routes** (`host.routes.js`):
+```javascript
+import express from 'express';
+import { createHost, getHosts, /* ... */ } from './host.controller.js';
 
-### 1.1.0
+const router = express.Router();
+router.post('/', createHost);
+router.get('/', getHosts);
+// ... more routes
+```
 
-Added features X, Y, and Z.
+**Model** (`host.model.js`):
+```javascript
+import mongoose from 'mongoose';
+
+const HostSchema = new mongoose.Schema({ /* ... */ }, { timestamps: true });
+export default mongoose.model('Host', HostSchema);
+```
+
+## 🤝 Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## 📄 License
+
+This extension is available under the MIT License.
+
+## 🔗 Links
+
+- [GitHub Repository](https://github.com/yourusername/project-file-generator)
+- [Report Issues](https://github.com/yourusername/project-file-generator/issues)
+- [VS Code Extension Guidelines](https://code.visualstudio.com/api/references/extension-guidelines)
+
+## 🎯 Roadmap
+
+**Backend:**
+- [ ] TypeScript support for backend modules
+- [ ] Validation middleware templates
+- [ ] Authentication/Authorization templates
+- [ ] Additional backend frameworks (NestJS, Fastify)
+
+**Frontend:**
+- [ ] React component generation
+- [ ] Next.js page templates
+- [ ] Redux/Context API state management templates
+- [ ] API service layer generation
+- [ ] React Hook Form integration
+
+**General:**
+- [ ] Custom template configurations
+- [ ] Test file generation (Jest, React Testing Library)
+- [ ] Environment configuration templates
+- [ ] Docker & deployment configs
 
 ---
 
-## Following extension guidelines
-
-Ensure that you've read through the extensions guidelines and follow the best practices for creating your extension.
-
-* [Extension Guidelines](https://code.visualstudio.com/api/references/extension-guidelines)
-
-## Working with Markdown
-
-You can author your README using Visual Studio Code. Here are some useful editor keyboard shortcuts:
-
-* Split the editor (`Cmd+\` on macOS or `Ctrl+\` on Windows and Linux).
-* Toggle preview (`Shift+Cmd+V` on macOS or `Shift+Ctrl+V` on Windows and Linux).
-* Press `Ctrl+Space` (Windows, Linux, macOS) to see a list of Markdown snippets.
-
-## For more information
-
-* [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
-* [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
-
-**Enjoy!**
+**Enjoy faster MERN development! 🚀**
