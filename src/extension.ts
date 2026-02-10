@@ -52,17 +52,55 @@ async function createBackendModule(targetFolderUri?: vscode.Uri) {
 	}
 }
 
+async function createReactComponent(targetFolderUri?: vscode.Uri) {
+	const language = await vscode.window.showQuickPick(
+		['JavaScript', 'TypeScript'],
+		{
+			placeHolder: 'Select language'
+		}
+	);
+
+	if (!language) return;
+
+	const useTypeScript = language === 'TypeScript';
+
+	const componentName = await vscode.window.showInputBox({
+		prompt: 'Enter component name (e.g., UserCard)',
+		placeHolder: 'UserCard'
+	});
+
+	if (!componentName) {
+		vscode.window.showWarningMessage('Component name is required.');
+		return;
+	}
+
+	// Input validation: only allow alphanumeric, hyphens, and underscores
+	if (!/^[a-zA-Z0-9_-]+$/.test(componentName)) {
+		vscode.window.showErrorMessage('Invalid component name. Use only letters, numbers, hyphens, and underscores.');
+		return;
+	}
+
+	createReactComponentFiles(componentName, useTypeScript, targetFolderUri);
+}
+
 export function activate(context: vscode.ExtensionContext) {
 	console.log('Project File Generator activated');
 
-	const command = vscode.commands.registerCommand(
+	const backendCommand = vscode.commands.registerCommand(
 		'projectFileGenerator.createBackendModule',
 		async (uri?: vscode.Uri) => {
 			await createBackendModule(uri);
 		}
 	);
 
-	context.subscriptions.push(command);
+	const reactCommand = vscode.commands.registerCommand(
+		'projectFileGenerator.createReactComponent',
+		async (uri?: vscode.Uri) => {
+			await createReactComponent(uri);
+		}
+	);
+
+	context.subscriptions.push(backendCommand, reactCommand);
 }
 
 
@@ -309,6 +347,55 @@ export default router;
 	}
 }
 
+function reactComponentTemplate(componentName: string, useTypeScript: boolean) {
+	const Name = toPascalCase(componentName);
+	const kebabName = toKebabCase(componentName);
+
+	if (useTypeScript) {
+		return `import React from 'react';
+import styles from './${Name}.module.css';
+
+interface ${Name}Props {
+	// TODO: define props
+}
+
+const ${Name}: React.FC<${Name}Props> = () => {
+	return (
+		<div className={styles.container}>
+			<h2>${Name} Component</h2>
+			{/* TODO: Add component content */}
+		</div>
+	);
+};
+
+export default ${Name};
+`;
+	} else {
+		return `import React from 'react';
+import styles from './${Name}.module.css';
+
+const ${Name} = () => {
+	return (
+		<div className={styles.container}>
+			<h2>${Name} Component</h2>
+			{/* TODO: Add component content */}
+		</div>
+	);
+};
+
+export default ${Name};
+`;
+	}
+}
+
+function cssModuleTemplate(componentName: string) {
+	return `.container {
+	padding: 1rem;
+	/* TODO: Add styles */
+}
+`;
+}
+
 function createMVCFiles(rawName: string, useTypeScript: boolean, targetFolderUri?: vscode.Uri) {
 	const root = getWorkspaceRoot();
 	if (!root) return;
@@ -379,6 +466,38 @@ function createFeatureFiles(rawName: string, useTypeScript: boolean, targetFolde
 	writeFiles(files, rawName);
 }
 
+function createReactComponentFiles(componentName: string, useTypeScript: boolean, targetFolderUri?: vscode.Uri) {
+	const root = getWorkspaceRoot();
+	if (!root) return;
+
+	const Name = toPascalCase(componentName);
+	const ext = useTypeScript ? 'tsx' : 'jsx';
+
+	// Always use src/components structure
+	const srcDir = path.join(root, 'src');
+	ensureFolder(srcDir);
+
+	const componentsDir = path.join(srcDir, 'components');
+	ensureFolder(componentsDir);
+
+	// Create component folder inside components
+	const componentDir = path.join(componentsDir, Name);
+	ensureFolder(componentDir);
+
+	const files = [
+		{
+			path: path.join(componentDir, `${Name}.${ext}`),
+			content: reactComponentTemplate(componentName, useTypeScript)
+		},
+		{
+			path: path.join(componentDir, `${Name}.module.css`),
+			content: cssModuleTemplate(componentName)
+		}
+	];
+
+	writeFiles(files, Name);
+}
+
 function writeFiles(files: { path: string; content: string }[], moduleName: string) {
 	for (const file of files) {
 		if (fs.existsSync(file.path)) {
@@ -391,7 +510,7 @@ function writeFiles(files: { path: string; content: string }[], moduleName: stri
 	}
 
 	vscode.window.showInformationMessage(
-		`REST backend module "${moduleName}" created successfully`
+		`Module "${moduleName}" created successfully`
 	);
 }
 

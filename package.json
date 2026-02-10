@@ -16,12 +16,21 @@
     {
       "command": "projectFileGenerator.createBackendModule",
       "title": "Create Backend Module"
+    },
+    {
+      "command": "projectFileGenerator.createReactComponent",
+      "title": "Create React Component"
     }
   ],
   "menus": {
     "explorer/context": [
       {
         "command": "projectFileGenerator.createBackendModule",
+        "when": "explorerResourceIsFolder",
+        "group": "2_workspace"
+      },
+      {
+        "command": "projectFileGenerator.createReactComponent",
         "when": "explorerResourceIsFolder",
         "group": "2_workspace"
       }
