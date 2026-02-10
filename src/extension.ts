@@ -28,6 +28,12 @@ async function createBackendModule() {
 		return;
 	}
 
+	// Input validation: only allow alphanumeric, hyphens, and underscores
+	if (!/^[a-zA-Z0-9_-]+$/.test(moduleName)) {
+		vscode.window.showErrorMessage('Invalid module name. Use only letters, numbers, hyphens, and underscores.');
+		return;
+	}
+
 	if (structure === ProjectStructure.MVC) {
 		createMVCFiles(moduleName.toLowerCase());
 	} else {
