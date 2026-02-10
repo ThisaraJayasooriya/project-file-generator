@@ -36,5 +36,12 @@
     "typescript": "^5.9.3",
     "@vscode/test-cli": "^0.0.12",
     "@vscode/test-electron": "^2.5.2"
+  },
+  "license": "MIT",
+  "publisher": "your-publisher-id",
+  "icon": "images/icon.png",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/project-file-generator.git"
   }
 }
