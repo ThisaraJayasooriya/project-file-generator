@@ -8,7 +8,7 @@ enum ProjectStructure {
 	FEATURE = 'Feature-based (module folder)'
 }
 
-async function createBackendModule() {
+async function createBackendModule(targetFolderUri?: vscode.Uri) {
 	const structure = await vscode.window.showQuickPick(
 		[ProjectStructure.MVC, ProjectStructure.FEATURE],
 		{
@@ -35,9 +35,9 @@ async function createBackendModule() {
 	}
 
 	if (structure === ProjectStructure.MVC) {
-		createMVCFiles(moduleName.toLowerCase());
+		createMVCFiles(moduleName.toLowerCase(), targetFolderUri);
 	} else {
-		createFeatureFiles(moduleName.toLowerCase());
+		createFeatureFiles(moduleName.toLowerCase(), targetFolderUri);
 	}
 }
 
@@ -46,8 +46,8 @@ export function activate(context: vscode.ExtensionContext) {
 
 	const command = vscode.commands.registerCommand(
 		'projectFileGenerator.createBackendModule',
-		async () => {
-			await createBackendModule();
+		async (uri?: vscode.Uri) => {
+			await createBackendModule(uri);
 		}
 	);
 
@@ -187,15 +187,19 @@ export default router;
 `;
 }
 
-function createMVCFiles(rawName: string) {
+function createMVCFiles(rawName: string, targetFolderUri?: vscode.Uri) {
 	const root = getWorkspaceRoot();
 	if (!root) return;
 
+	// Always use src folder structure
+	const srcDir = path.join(root, 'src');
+	ensureFolder(srcDir);
+
 	const name = toKebabCase(rawName);
 
-	const controllersDir = path.join(root, 'src/controllers');
-	const routesDir = path.join(root, 'src/routes');
-	const modelsDir = path.join(root, 'src/models');
+	const controllersDir = path.join(srcDir, 'controllers');
+	const routesDir = path.join(srcDir, 'routes');
+	const modelsDir = path.join(srcDir, 'models');
 
 	ensureFolder(controllersDir);
 	ensureFolder(routesDir);
@@ -219,15 +223,17 @@ function createMVCFiles(rawName: string) {
 	writeFiles(files, rawName);
 }
 
-function createFeatureFiles(rawName: string) {
+function createFeatureFiles(rawName: string, targetFolderUri?: vscode.Uri) {
 	const root = getWorkspaceRoot();
 	if (!root) return;
+
+	// Always use src folder structure
+	const srcDir = path.join(root, 'src');
+	ensureFolder(srcDir);
 
 	const kebab = toKebabCase(rawName);   // folder & file names
 	const pascal = toPascalCase(rawName); // template names
 
-	// Feature folder inside 'src'
-	const srcDir = path.join(root, 'src');
 	const moduleDir = path.join(srcDir, kebab); // feature-based folder
 	ensureFolder(moduleDir);
 

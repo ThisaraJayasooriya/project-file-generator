@@ -17,7 +17,16 @@
       "command": "projectFileGenerator.createBackendModule",
       "title": "Create Backend Module"
     }
-  ]
+  ],
+  "menus": {
+    "explorer/context": [
+      {
+        "command": "projectFileGenerator.createBackendModule",
+        "when": "explorerResourceIsFolder",
+        "group": "2_workspace"
+      }
+    ]
+  }
 },
   "scripts": {
     "vscode:prepublish": "npm run compile",
