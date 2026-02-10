@@ -9,6 +9,17 @@ enum ProjectStructure {
 }
 
 async function createBackendModule(targetFolderUri?: vscode.Uri) {
+	const language = await vscode.window.showQuickPick(
+		['JavaScript', 'TypeScript'],
+		{
+			placeHolder: 'Select language'
+		}
+	);
+
+	if (!language) return;
+
+	const useTypeScript = language === 'TypeScript';
+
 	const structure = await vscode.window.showQuickPick(
 		[ProjectStructure.MVC, ProjectStructure.FEATURE],
 		{
@@ -35,9 +46,9 @@ async function createBackendModule(targetFolderUri?: vscode.Uri) {
 	}
 
 	if (structure === ProjectStructure.MVC) {
-		createMVCFiles(moduleName.toLowerCase(), targetFolderUri);
+		createMVCFiles(moduleName.toLowerCase(), useTypeScript, targetFolderUri);
 	} else {
-		createFeatureFiles(moduleName.toLowerCase(), targetFolderUri);
+		createFeatureFiles(moduleName.toLowerCase(), useTypeScript, targetFolderUri);
 	}
 }
 
@@ -75,11 +86,55 @@ function capitalize(word: string) {
 	return word.charAt(0).toUpperCase() + word.slice(1);
 }
 
-function controllerTemplate(rawName: string) {
+function controllerTemplate(rawName: string, useTypeScript: boolean) {
 	const Name = toPascalCase(rawName);
 	const name = toCamelCase(rawName);
 
-	return `export const create${Name} = async (req, res) => {
+	if (useTypeScript) {
+		return `import { Request, Response } from 'express';
+
+export const create${Name} = async (req: Request, res: Response): Promise<void> => {
+	try {
+		res.status(201).json({ message: '${Name} created successfully' });
+	} catch (error: any) {
+		res.status(500).json({ error: error.message });
+	}
+};
+
+export const get${Name}s = async (req: Request, res: Response): Promise<void> => {
+	try {
+		res.status(200).json([]);
+	} catch (error: any) {
+		res.status(500).json({ error: error.message });
+	}
+};
+
+export const get${Name}ById = async (req: Request, res: Response): Promise<void> => {
+	try {
+		res.status(200).json({});
+	} catch (error: any) {
+		res.status(500).json({ error: error.message });
+	}
+};
+
+export const update${Name} = async (req: Request, res: Response): Promise<void> => {
+	try {
+		res.status(200).json({ message: '${Name} updated successfully' });
+	} catch (error: any) {
+		res.status(500).json({ error: error.message });
+	}
+};
+
+export const delete${Name} = async (req: Request, res: Response): Promise<void> => {
+	try {
+		res.status(200).json({ message: '${Name} deleted successfully' });
+	} catch (error: any) {
+		res.status(500).json({ error: error.message });
+	}
+};
+`;
+	} else {
+		return `export const create${Name} = async (req, res) => {
 	try {
 		res.status(201).json({ message: '${Name} created successfully' });
 	} catch (error) {
@@ -119,13 +174,36 @@ export const delete${Name} = async (req, res) => {
 	}
 };
 `;
+	}
 }
 
-function routeTemplate(rawName: string) {
-	const Name = toPascalCase(rawName);   // PascalCase for functions/classes
-	const routeName = toKebabCase(rawName); // kebab-case for URLs & filenames
+function routeTemplate(rawName: string, useTypeScript: boolean) {
+	const Name = toPascalCase(rawName);
+	const routeName = toKebabCase(rawName);
+	const ext = useTypeScript ? '' : '.js';
 
-	return `import express from 'express';
+	if (useTypeScript) {
+		return `import express, { Router } from 'express';
+import {
+	create${Name},
+	get${Name}s,
+	get${Name}ById,
+	update${Name},
+	delete${Name}
+} from '../controllers/${routeName}.controller';
+
+const router: Router = express.Router();
+
+router.post('/', create${Name});
+router.get('/', get${Name}s);
+router.get('/:id', get${Name}ById);
+router.put('/:id', update${Name});
+router.delete('/:id', delete${Name});
+
+export default router;
+`;
+	} else {
+		return `import express from 'express';
 import {
 	create${Name},
 	get${Name}s,
@@ -144,12 +222,32 @@ router.delete('/:id', delete${Name});
 
 export default router;
 `;
+	}
 }
 
-function modelTemplate(rawName: string) {
+function modelTemplate(rawName: string, useTypeScript: boolean) {
 	const Name = toPascalCase(rawName);
 
-	return `import mongoose from 'mongoose';
+	if (useTypeScript) {
+		return `import mongoose, { Schema, Document } from 'mongoose';
+
+export interface I${Name} extends Document {
+	// TODO: define fields
+	createdAt?: Date;
+	updatedAt?: Date;
+}
+
+const ${Name}Schema = new Schema<I${Name}>(
+	{
+		// TODO: define fields
+	},
+	{ timestamps: true }
+);
+
+export default mongoose.model<I${Name}>('${Name}', ${Name}Schema);
+`;
+	} else {
+		return `import mongoose from 'mongoose';
 
 const ${Name}Schema = new mongoose.Schema(
 	{
@@ -160,13 +258,36 @@ const ${Name}Schema = new mongoose.Schema(
 
 export default mongoose.model('${Name}', ${Name}Schema);
 `;
+	}
 }
 
-function routeTemplateFeature(rawName: string) {
+function routeTemplateFeature(rawName: string, useTypeScript: boolean) {
 	const Name = toPascalCase(rawName);
 	const routeName = toKebabCase(rawName);
+	const ext = useTypeScript ? '' : '.js';
 
-	return `import express from 'express';
+	if (useTypeScript) {
+		return `import express, { Router } from 'express';
+import {
+	create${Name},
+	get${Name}s,
+	get${Name}ById,
+	update${Name},
+	delete${Name}
+} from './${routeName}.controller';
+
+const router: Router = express.Router();
+
+router.post('/', create${Name});
+router.get('/', get${Name}s);
+router.get('/:id', get${Name}ById);
+router.put('/:id', update${Name});
+router.delete('/:id', delete${Name});
+
+export default router;
+`;
+	} else {
+		return `import express from 'express';
 import {
 	create${Name},
 	get${Name}s,
@@ -185,9 +306,10 @@ router.delete('/:id', delete${Name});
 
 export default router;
 `;
+	}
 }
 
-function createMVCFiles(rawName: string, targetFolderUri?: vscode.Uri) {
+function createMVCFiles(rawName: string, useTypeScript: boolean, targetFolderUri?: vscode.Uri) {
 	const root = getWorkspaceRoot();
 	if (!root) return;
 
@@ -196,6 +318,7 @@ function createMVCFiles(rawName: string, targetFolderUri?: vscode.Uri) {
 	ensureFolder(srcDir);
 
 	const name = toKebabCase(rawName);
+	const ext = useTypeScript ? 'ts' : 'js';
 
 	const controllersDir = path.join(srcDir, 'controllers');
 	const routesDir = path.join(srcDir, 'routes');
@@ -207,23 +330,23 @@ function createMVCFiles(rawName: string, targetFolderUri?: vscode.Uri) {
 
 	const files = [
 		{
-			path: path.join(controllersDir, `${name}.controller.js`),
-			content: controllerTemplate(rawName)
+			path: path.join(controllersDir, `${name}.controller.${ext}`),
+			content: controllerTemplate(rawName, useTypeScript)
 		},
 		{
-			path: path.join(routesDir, `${name}.routes.js`),
-			content: routeTemplate(rawName)
+			path: path.join(routesDir, `${name}.routes.${ext}`),
+			content: routeTemplate(rawName, useTypeScript)
 		},
 		{
-			path: path.join(modelsDir, `${name}.model.js`),
-			content: modelTemplate(rawName)
+			path: path.join(modelsDir, `${name}.model.${ext}`),
+			content: modelTemplate(rawName, useTypeScript)
 		}
 	];
 
 	writeFiles(files, rawName);
 }
 
-function createFeatureFiles(rawName: string, targetFolderUri?: vscode.Uri) {
+function createFeatureFiles(rawName: string, useTypeScript: boolean, targetFolderUri?: vscode.Uri) {
 	const root = getWorkspaceRoot();
 	if (!root) return;
 
@@ -233,22 +356,23 @@ function createFeatureFiles(rawName: string, targetFolderUri?: vscode.Uri) {
 
 	const kebab = toKebabCase(rawName);   // folder & file names
 	const pascal = toPascalCase(rawName); // template names
+	const ext = useTypeScript ? 'ts' : 'js';
 
 	const moduleDir = path.join(srcDir, kebab); // feature-based folder
 	ensureFolder(moduleDir);
 
 	const files = [
 		{
-			path: path.join(moduleDir, `${kebab}.controller.js`),
-			content: controllerTemplate(pascal)
+			path: path.join(moduleDir, `${kebab}.controller.${ext}`),
+			content: controllerTemplate(pascal, useTypeScript)
 		},
 		{
-			path: path.join(moduleDir, `${kebab}.routes.js`),
-			content: routeTemplateFeature(rawName)
+			path: path.join(moduleDir, `${kebab}.routes.${ext}`),
+			content: routeTemplateFeature(rawName, useTypeScript)
 		},
 		{
-			path: path.join(moduleDir, `${kebab}.model.js`),
-			content: modelTemplate(pascal)
+			path: path.join(moduleDir, `${kebab}.model.${ext}`),
+			content: modelTemplate(pascal, useTypeScript)
 		}
 	];
 
