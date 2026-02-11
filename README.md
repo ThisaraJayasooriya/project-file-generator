@@ -1,11 +1,11 @@
 # MERN Project File Generator
 
-A powerful VS Code extension that accelerates MERN stack development by automatically generating complete project modules with proper file structure, naming conventions, and boilerplate code for both frontend and backend components.
+A professional VS Code extension that accelerates MERN stack development by automatically generating complete project modules with proper file structure, naming conventions, and boilerplate code for both frontend and backend components.
 
-## ✨ Features
+## Features
 
-### 🚀 Quick Module Generation
-Generate complete MERN stack modules with a single command:
+### Quick Module Generation
+Generate complete MERN stack modules with a single command using the Command Palette or right-click context menu.
 
 **Backend Modules:**
 - **Controllers**: CRUD operation handlers with comprehensive error handling
@@ -17,7 +17,7 @@ Generate complete MERN stack modules with a single command:
 - **CSS Modules**: Scoped styling with `.module.css` files
 - **Type Safety**: Props interfaces for TypeScript projects
 
-### 🏗️ Multiple Project Structures
+### Multiple Project Structures
 Choose between popular MERN stack architectures:
 
 **Backend Structures:**
@@ -51,21 +51,21 @@ src/
         └── ComponentName.module.css
 ```
 
-### 🎯 Smart Naming Conventions
+### Smart Naming Conventions
 Automatically applies proper case conventions:
 - **kebab-case** for file names and URLs
 - **PascalCase** for model/class names
 - **camelCase** for variables and functions
 
-### 📝 Pre-configured Templates
+### Pre-configured Templates
 Generated files include:
-- ✅ Standard CRUD operations (Create, Read, Update, Delete, List)
-- ✅ Error handling and status codes
-- ✅ Mongoose schema boilerplate
-- ✅ Express router configuration
-- ✅ ES6 module syntax
+- Standard CRUD operations (Create, Read, Update, Delete, List)
+- Error handling and status codes
+- Mongoose schema boilerplate
+- Express router configuration
+- ES6 module syntax
 
-## 📦 Installation
+## Installation
 
 ### From VS Code Marketplace (Recommended)
 1. Open VS Code
@@ -80,9 +80,13 @@ Generated files include:
 4. Click `...` menu → Install from VSIX
 5. Select the downloaded `.vsix` file
 
-## 🛠️ Usage
+## Usage
 
-### Creating Backend Modules
+This extension provides two convenient methods to create files: using the Command Palette or the right-click context menu.
+
+### Method 1: Using Command Palette
+
+**Creating Backend Modules:**
 
 1. Open your MERN project workspace in VS Code
 2. Open Command Palette: `Ctrl+Shift+P` (Windows/Linux) or `Cmd+Shift+P` (Mac)
@@ -90,20 +94,38 @@ Generated files include:
 4. Choose language (JavaScript or TypeScript)
 5. Select project structure (MVC or Feature-based)
 6. Enter module name (e.g., "user", "product", "order")
-7. Files are generated automatically! ✨
+7. Files are generated automatically in the appropriate directory
 
-### Creating React Components
+**Creating React Components:**
 
 1. Open your React/MERN project workspace
-2. Open Command Palette: `Ctrl+Shift+P` / `Cmd+Shift+P`
+2. Open Command Palette: `Ctrl+Shift+P` (Windows/Linux) or `Cmd+Shift+P` (Mac)
 3. Type and select **"Create React Component"**
 4. Choose language (JavaScript or TypeScript)
 5. Enter component name (e.g., "UserCard", "ProductList")
-6. Component files are generated in `src/components/` ✨
+6. Component files are generated in `src/components/`
 
-**Tip:** You can also right-click any folder in the Explorer and select "Create Backend Module" or "Create React Component" from the context menu!
+### Method 2: Using Right-Click Context Menu (Recommended)
 
-## 📋 Requirements
+**Creating Backend Modules:**
+
+1. In the VS Code Explorer panel, navigate to the folder where you want to create files
+2. Right-click on the folder (or in the empty space within the folder)
+3. Select **"Create Backend Module"** from the context menu
+4. Example Output
+
+When you create a module named "host", the extension generates the following fil
+**Creating React Components:**
+
+1. In the VS Code Explorer panel, navigate to your desired folder
+2. Right-click on the folder (or in the empty space within the folder)
+3. Select **"Create React Component"** from the context menu
+4. Follow the prompts to choose language and enter component name
+5. Component files are generated in the selected folder location
+
+**Note:** The right-click method allows you to generate files in any folder within your workspace, providing greater flexibility in organizing your project structure.
+
+## Requirements
 
 - Visual Studio Code v1.109.0 or higher
 - Node.js project with `src/` directory structure
@@ -112,7 +134,7 @@ Generated files include:
 
 No additional setup required! The extension works out of the box.
 
-## 🎨 Example Output
+##  Example Output
 
 When you create a module named "host", the extension generates:
 
@@ -142,16 +164,17 @@ import mongoose from 'mongoose';
 
 const HostSchema = new mongoose.Schema({ /* ... */ }, { timestamps: true });
 export default mongoose.model('Host', HostSchema);
-```
+```Benefits
 
-**React Component** (`UserCard.tsx`):
-```typescript
-import styles from './UserCard.module.css';
+- **Save Time**: Generate complete modules in seconds, not minutes
+- **Consistent Structure**: Maintain uniform code structure across your project
+- **Best Practices**: Follow MERN stack conventions automatically
+- **Flexible**: Choose between MVC or feature-based architectures
+- **TypeScript Ready**: Full TypeScript support for type-safe development
+- **Modern React**: Uses functional components and CSS modules
+- **Easy Access**: Create files via Command Palette or right-click context menu
 
-interface UserCardProps {
-	// TODO: define props
-}
-
+##
 const UserCard: React.FC<UserCardProps> = () => {
 	return (
 		<div className={styles.container}>
@@ -164,41 +187,42 @@ const UserCard: React.FC<UserCardProps> = () => {
 export default UserCard;
 ```
 
-## 💡 Why Use This Extension?
+##  Why Use This Extension?
 
-- ⚡ **Save Time**: Generate complete modules in seconds, not minutes
-- 📐 **Consistent Structure**: Maintain uniform code structure across your project
-- 🎯 **Best Practices**: Follow MERN stack conventions automatically
-- 🔧 **Flexible**: Choose between MVC or feature-based architectures
-- 🌐 **TypeScript Ready**: Full TypeScript support for type-safe development
-- 🎨 **Modern React**: Uses functional components and CSS modules
+-  **Save Time**: Generate complete modules in seconds, not minutes
+-  **Consistent Structure**: Maintain uniform code structure across your project
+-  **Best Practices**: Follow MERN stack conventions automatically
+-  **Flexible**: Choose between MVC or feature-based architectures
+-  **TypeScript Ready**: Full TypeScript support for type-safe development
+-  **Modern React**: Uses functional components and CSS modules
 
-## 🤝 Contributing
+##  Contributing
 
 Contributions, issues, and feature requests are welcome! Feel free to check the issues page if you want to contribute.
-
-## 📄 License
+License
 
 This extension is licensed under the MIT License.
 
-## ⭐ Support
+## Support
 
 If you find this extension helpful, please consider:
-- ⭐ Starring the project
-- 📢 Sharing it with other developers
-- 🐛 Reporting bugs or suggesting features
-- 💬 Leaving a review on the marketplace
+- Starring the project
+- Sharing it with other developers
+- Reporting bugs or suggesting features
+- Leaving a review on the marketplace
 
-## 🎯 Roadmap
+## Roadmap
 
-**Completed ✅**
-- [x] Backend module generation (JavaScript & TypeScript)
-- [x] React component generation (JavaScript & TypeScript)
-- [x] MVC and Feature-based structures
-- [x] CSS Modules support
-- [x] Smart naming conventions
+**Completed:**
+- Backend module generation (JavaScript & TypeScript)
+- React component generation (JavaScript & TypeScript)
+- MVC and Feature-based structures
+- CSS Modules support
+- Smart naming conventions
+- Context menu integration
 
-**Coming Soon 🚀**
+**Planned Features:
+**Coming Soon **
 
 **Backend:**
 - [ ] Validation middleware templates
@@ -219,8 +243,6 @@ If you find this extension helpful, please consider:
 - [ ] Environment configuration templates
 - [ ] Docker & deployment configs
 
----
+---for MERN developers to accelerate development workflowpers**
 
-**Made with ❤️ for MERN developers**
 
-**Enjoy faster development! 🚀**
