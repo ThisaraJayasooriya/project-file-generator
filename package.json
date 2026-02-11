@@ -1,13 +1,27 @@
 {
   "name": "project-file-generator",
-  "displayName": "project-file-generator",
-  "description": "Generate complete module files for MERN stack projects - controllers, routes, models, components, and more",
-  "version": "0.0.1",
+  "displayName": "MERN Project File Generator",
+  "description": "Accelerate MERN stack development with automatic module generation - controllers, routes, models, and React components with proper structure and boilerplate",
+  "version": "1.0.0",
   "engines": {
     "vscode": "^1.109.0"
   },
   "categories": [
+    "Snippets",
+    "Programming Languages",
     "Other"
+  ],
+  "keywords": [
+    "mern",
+    "react",
+    "express",
+    "mongodb",
+    "nodejs",
+    "typescript",
+    "generator",
+    "boilerplate",
+    "mvc",
+    "component"
   ],
   "activationEvents": [],
   "main": "./out/extension.js",
@@ -56,10 +70,6 @@
     "@vscode/test-electron": "^2.5.2"
   },
   "license": "MIT",
-  "publisher": "your-publisher-id",
-  "icon": "images/icon.png",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/yourusername/project-file-generator.git"
-  }
+  "publisher": "ThisaraJayasooriya",
+  "icon": "images/icon.png"
 }
