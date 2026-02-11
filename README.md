@@ -179,7 +179,7 @@ Contributions, issues, and feature requests are welcome! Feel free to check the 
 
 ## 📄 License
 
-This extension is licensed under the [MIT License](LICENSE).
+This extension is licensed under the MIT License.
 
 ## ⭐ Support
 
