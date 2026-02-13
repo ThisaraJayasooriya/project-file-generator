@@ -2,6 +2,16 @@
 
 All notable changes to the "MERN Project File Generator" extension will be documented in this file.
 
+## [1.0.1] - 2026-02-12
+
+### Changed
+- Updated README documentation to be more professional and user-friendly
+- Removed informal emojis from documentation
+- Enhanced usage instructions with clearer step-by-step guidance
+- Added prominent documentation for right-click context menu functionality
+- Reorganized README sections for better readability and navigation
+- Improved explanation of both Command Palette and context menu usage methods
+
 ## [1.0.0] - 2026-02-11
 
 ### Added

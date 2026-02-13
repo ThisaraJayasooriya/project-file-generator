@@ -2,7 +2,7 @@
   "name": "project-file-generator",
   "displayName": "MERN Project File Generator",
   "description": "Accelerate MERN stack development with automatic module generation - controllers, routes, models, and React components with proper structure and boilerplate",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "engines": {
     "vscode": "^1.109.0"
   },
